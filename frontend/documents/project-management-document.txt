@@ -1,0 +1,52 @@
+Problema:
+Pequenas equipes precisam de uma forma simples de organizar projetos e acompanhar seu status.
+Usuário:
+- Dono de uma workspace
+- Crie e gerencia projetos
+Funcionalidades do MVP
+Autenticação:
+- Criar conta
+- Login
+- Logout
+Workspace:
+- Criar workspace
+- Visualizar workspace do usuário
+Projetos:
+- Criar projeto
+- Listar projetos da workspace
+- Alterar status do projeto (CREATED, IN_PROGRESS, DONE, ARCHIVED)
+- Visualizar detalhes do projeto
+Regras de negócio:
+Projetos:
+- Projeto começa em CREATED
+- Só pode avançar na ordem correta
+- Projeto ARCHIVED não pode ser alterado
+- Nome do projeto é obrigatório
+Segurança:
+- Usuário só acessa sua própria workspace
+- Usuário só acessa projetos da sua workspace
+Entregas:
+Frontend (Next.js):
+- React Query
+- Páginas 
+      - Login
+      - Logout
+      - Workspace
+      - Home
+- Componentes
+	- Sidebar (Workspaces)
+	- Dialog
+	- Botão
+	- Input
+Backend (Spring Boot)
+- Endpoints
+o Auth
+o Workspace
+o Projects
+Database (Postgres)
+- Modelos
+o User
+o Workspace
+o Projects
+        
+
