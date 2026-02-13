@@ -1,6 +1,6 @@
 package dev.cauegallizzi.backend.repository;
 
-import dev.cauegallizzi.backend.entities.User;
+import dev.cauegallizzi.backend.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

@@ -1,6 +1,6 @@
-package dev.cauegallizzi.backend.entities;
+package dev.cauegallizzi.backend.entity;
 
-import dev.cauegallizzi.backend.entities.enums.ProjectStatus;
+import dev.cauegallizzi.backend.entity.enums.ProjectStatus;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;

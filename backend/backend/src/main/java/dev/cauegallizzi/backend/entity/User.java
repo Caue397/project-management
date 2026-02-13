@@ -1,4 +1,4 @@
-package dev.cauegallizzi.backend.entities;
+package dev.cauegallizzi.backend.entity;
 
 import jakarta.persistence.*;
 import lombok.Getter;

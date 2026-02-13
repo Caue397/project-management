@@ -1,4 +1,4 @@
-package dev.cauegallizzi.backend.entities.enums;
+package dev.cauegallizzi.backend.entity.enums;
 
 public enum ProjectStatus {
     CREATED,
