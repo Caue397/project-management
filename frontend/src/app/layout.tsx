@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { geistMono } from "../fonts/exporter";
+import ClientProvider from "@/providers/client";
 
 export const metadata: Metadata = {
   title: "Project Management",
@@ -18,7 +19,9 @@ export default function RootLayout({
       <body
         className={`${geistMono.className} antialiased`}
       >
-        {children}
+        <ClientProvider>
+          {children}
+        </ClientProvider>
       </body>
     </html>
   );

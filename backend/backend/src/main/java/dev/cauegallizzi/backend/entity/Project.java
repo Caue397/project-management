@@ -3,6 +3,7 @@ package dev.cauegallizzi.backend.entity;
 import dev.cauegallizzi.backend.entity.enums.ProjectStatus;
 import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -10,11 +11,13 @@ import org.hibernate.annotations.UpdateTimestamp;
 import java.time.Instant;
 import java.util.UUID;
 
+@NoArgsConstructor
 @Setter
 @Getter
 @Entity
 @Table(name = "tb_projects")
 public class Project {
+
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "project_id")

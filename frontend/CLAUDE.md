@@ -103,10 +103,10 @@ Os templates visuais e de código estão em `frontend/templates/`.
 
 ```typescript
 // Importações padrão
-import { cn } from '@/libs/utils';           // tailwind-merge helper
+import { cn } from '@/libs/merge-classname';  // tailwind-merge helper
 import { motion, AnimatePresence } from 'framer-motion';
 import { useClickAway } from '@uidotdev/usehooks';
-import { Lu* } from 'react-icons/lu';        // Lucide icons
+import { Lu* } from 'react-icons/lu';          // Lucide icons
 
 // Padrão de animação para modals/dropdowns
 initial={{ opacity: 0, y: 10 }}
@@ -121,7 +121,7 @@ exit={{ opacity: 0, y: 10 }}
 'ring-1 ring-offset-2 ring-primary/40'      // Focus ring
 ```
 
-### Utilitário cn() (criar em `src/libs/utils.ts`)
+### Utilitário cn() — `src/libs/merge-classname.ts`
 
 ```typescript
 import { twMerge } from 'tailwind-merge';
@@ -129,6 +129,116 @@ import { clsx, type ClassValue } from 'clsx';
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
+}
+```
+
+Usar `cn()` sempre que a lista de classes inline ficar longa ou condicional.
+
+---
+
+## Convenções de Código
+
+### Gerenciamento de Estado Assíncrono — `usePromiseStatus`
+
+Toda chamada de API em componentes cliente deve usar o hook `usePromiseStatus` de `src/libs/promise-status.ts` para gerenciar os estados `loading`, `error` e `data`.
+
+```typescript
+import { usePromiseStatus } from '@/libs/promise-status';
+
+const { loading, error, data, exec } = usePromiseStatus(minhaFuncaoAsync);
+
+// Disparar a ação
+await exec(args);
+```
+
+Não usar `useState` manual para controlar loading/error de requisições.
+
+---
+
+### Cliente de Rede — `browserClient`
+
+O `browserClient` expõe os clientes do React Query para uso em componentes cliente e servidor. Sempre importar o cliente a partir dele, nunca instanciar `QueryClient` diretamente nos componentes.
+
+```typescript
+// Componente cliente
+import { browserClient } from '@/network/browser-client';
+
+// Componente servidor (SSR)
+import { QueryClient } from '@tanstack/react-query';
+```
+
+---
+
+### Queries (Client Components) — `src/network/queries/`
+
+Queries usadas em componentes cliente ficam em `src/network/queries/`, organizadas por domínio:
+
+```
+src/network/queries/
+├── auth.ts
+├── workspace.ts
+└── project.ts
+```
+
+**Convenção de nomes:**
+- Recurso singular: `workspaceQuery` — busca uma workspace
+- Recurso plural: `workspacesQuery` — lista workspaces
+- Seguir o mesmo padrão para outros domínios: `projectQuery`, `projectsQuery`, `authQuery`, etc.
+
+Cada função retorna um objeto compatível com `useQuery` / `useSuspenseQuery`:
+
+```typescript
+// src/network/queries/workspace.ts
+import { network } from '../network';
+
+export function workspaceQuery(slug: string) {
+  return {
+    queryKey: ['workspace', slug],
+    queryFn: () => network.get(`/workspace/${slug}`).then((r) => r.data),
+  };
+}
+
+export function workspacesQuery() {
+  return {
+    queryKey: ['workspaces'],
+    queryFn: () => network.get('/workspace').then((r) => r.data),
+  };
+}
+```
+
+---
+
+### Queries SSR (Server Components) — `src/network/ssr/`
+
+Prefetch de dados em Server Components fica em `src/network/ssr/`, também organizado por domínio.
+
+```
+src/network/ssr/
+├── auth.ts
+├── workspace.ts
+└── project.ts
+```
+
+Padrão obrigatório — recebe o `QueryClient` e o contexto necessário (ex: `slug`), serializa os cookies para repassar ao servidor e usa `client.fetchQuery`:
+
+```typescript
+// src/network/ssr/workspace.ts
+import { QueryClient } from '@tanstack/react-query';
+import { cookies } from 'next/headers';
+import { network } from '../network';
+
+export async function ssrWorkspace(client: QueryClient, slug: string) {
+  const serialized = (await cookies()).toString();
+
+  return client.fetchQuery({
+    queryKey: ['workspace', slug],
+    queryFn: async () => {
+      const response = await network.get(`/workspace/${slug}`, {
+        headers: { cookie: serialized },
+      });
+      return response.data;
+    },
+  });
 }
 ```
 

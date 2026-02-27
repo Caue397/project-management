@@ -2,7 +2,7 @@
 
 import { createContext, ReactNode, useContext, useEffect } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { cn } from '@/libs/utils';
+import { cn } from '@/libs/merge-classname';
 import { useClickAway } from '@uidotdev/usehooks';
 
 type DialogContextType = {

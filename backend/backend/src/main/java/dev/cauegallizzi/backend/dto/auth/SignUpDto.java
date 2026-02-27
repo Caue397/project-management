@@ -1,4 +1,4 @@
-package dev.cauegallizzi.backend.dto;
+package dev.cauegallizzi.backend.dto.auth;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;

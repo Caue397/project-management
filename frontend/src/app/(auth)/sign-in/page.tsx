@@ -2,10 +2,36 @@
 
 import Button from '@/components/ui/button';
 import Input from '@/components/ui/input';
+import { usePromiseStatus } from '@/libs/promise-status';
+import { network } from '@/network/network';
+import { SignInForm, signInSchema } from '@/schemas/auth-schema';
+import { zodResolver } from '@hookform/resolvers/zod';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { useForm } from 'react-hook-form';
 import { LuMail, LuLock } from 'react-icons/lu';
 
 export default function SignInPage() {
+  const router = useRouter();
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<SignInForm>({
+    resolver: zodResolver(signInSchema),
+    defaultValues: { email: '', password: '' },
+  });
+
+  const { loading, exec } = usePromiseStatus(async (data: SignInForm) => {
+    await network.post('/auth/sign-in', data);
+    router.push('/workspace');
+  });
+
+  function onSubmit(data: SignInForm) {
+    exec(data);
+  }
+
   return (
     <main className="min-h-screen bg-background flex items-center justify-center p-4">
       <div className="w-full max-w-md bg-white rounded-2xl shadow-sm border border-foreground/10 p-8">
@@ -16,12 +42,14 @@ export default function SignInPage() {
           </p>
         </div>
 
-        <form className="space-y-4">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <Input
             label="Email"
             type="email"
             placeholder="seu@email.com"
             icon={<LuMail size={18} />}
+            error={errors.email?.message}
+            {...register('email')}
           />
 
           <Input
@@ -29,10 +57,12 @@ export default function SignInPage() {
             type="password"
             placeholder="********"
             icon={<LuLock size={18} />}
+            error={errors.password?.message}
+            {...register('password')}
           />
 
-          <Button type="submit" className="w-full">
-            Entrar
+          <Button type="submit" className="w-full" disabled={loading}>
+            {loading ? 'Entrando...' : 'Entrar'}
           </Button>
         </form>
 

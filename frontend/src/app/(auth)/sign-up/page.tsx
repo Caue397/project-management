@@ -2,10 +2,34 @@
 
 import Button from '@/components/ui/button';
 import Input from '@/components/ui/input';
+import { usePromiseStatus } from '@/libs/promise-status';
+import { network } from '@/network/network';
+import { SignUpForm, signUpSchema } from '@/schemas/auth-schema';
+import { zodResolver } from '@hookform/resolvers/zod';
 import Link from 'next/link';
+import { useForm } from 'react-hook-form';
 import { LuMail, LuLock, LuUser } from 'react-icons/lu';
 
 export default function SignUpPage() {
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<SignUpForm>({
+    resolver: zodResolver(signUpSchema),
+    defaultValues: { name: '', email: '', password: '', confirmPassword: '' },
+  });
+
+  const { loading, exec } = usePromiseStatus(
+    async (data: Omit<SignUpForm, 'confirmPassword'>) => {
+      await network.post('/auth/sign-up', data);
+    }
+  );
+
+  function onSubmit({ confirmPassword: _, ...body }: SignUpForm) {
+    exec(body);
+  }
+
   return (
     <main className="min-h-screen bg-background flex items-center justify-center p-4">
       <div className="w-full max-w-md bg-white rounded-2xl shadow-sm border border-foreground/10 p-8">
@@ -16,12 +40,14 @@ export default function SignUpPage() {
           </p>
         </div>
 
-        <form className="space-y-4">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <Input
             label="Nome"
             type="text"
             placeholder="Seu nome"
             icon={<LuUser size={18} />}
+            error={errors.name?.message}
+            {...register('name')}
           />
 
           <Input
@@ -29,6 +55,8 @@ export default function SignUpPage() {
             type="email"
             placeholder="seu@email.com"
             icon={<LuMail size={18} />}
+            error={errors.email?.message}
+            {...register('email')}
           />
 
           <Input
@@ -36,6 +64,8 @@ export default function SignUpPage() {
             type="password"
             placeholder="********"
             icon={<LuLock size={18} />}
+            error={errors.password?.message}
+            {...register('password')}
           />
 
           <Input
@@ -43,10 +73,12 @@ export default function SignUpPage() {
             type="password"
             placeholder="********"
             icon={<LuLock size={18} />}
+            error={errors.confirmPassword?.message}
+            {...register('confirmPassword')}
           />
 
-          <Button type="submit" className="w-full">
-            Criar conta
+          <Button type="submit" className="w-full" disabled={loading}>
+            {loading ? 'Criando conta...' : 'Criar conta'}
           </Button>
         </form>
 
@@ -61,10 +93,7 @@ export default function SignUpPage() {
 
         <p className="text-sm text-foreground/70">
           Ja tem uma conta?{' '}
-          <Link
-            href="/sign-in"
-            className="text-primary font-medium hover:underline"
-          >
+          <Link href="/sign-in" className="text-primary font-medium hover:underline">
             Fazer login &rarr;
           </Link>
         </p>
