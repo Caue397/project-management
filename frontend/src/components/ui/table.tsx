@@ -36,7 +36,7 @@ export function TableHeader({ children, className, align = 'left' }: TableHeader
 }
 
 export function TableBody({ children, className }: SimpleProps) {
-  return <tbody className={cn('bg-foreground/4', className)}>{children}</tbody>;
+  return <tbody className={cn(className)}>{children}</tbody>;
 }
 
 export function TableRow({ children, className, isLast }: TableRowProps) {

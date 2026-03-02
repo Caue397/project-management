@@ -1,6 +1,6 @@
 package dev.cauegallizzi.backend.entity;
 
-import dev.cauegallizzi.backend.entity.enums.ProjectStatus;
+import dev.cauegallizzi.backend.entity.enums.IssueStatus;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -9,33 +9,28 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.Instant;
-import java.util.List;
 import java.util.UUID;
 
 @NoArgsConstructor
 @Setter
 @Getter
 @Entity
-@Table(name = "tb_projects")
-public class Project {
+@Table(name = "tb_issues")
+public class Issue {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(name = "project_id")
-    private UUID projectId;
+    @Column(name = "issue_id")
+    private UUID issueId;
     private String title;
     private String description;
-    private String content;
 
     @Enumerated(EnumType.STRING)
-    private ProjectStatus status;
+    private IssueStatus status;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "workspace_id", nullable = false)
-    private Workspace workspace;
-
-    @OneToMany(mappedBy = "project", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Issue> issues;
+    @JoinColumn(name = "project_id", nullable = false)
+    private Project project;
 
     @CreationTimestamp
     private Instant createdAt;

@@ -381,6 +381,147 @@ Delete a project.
 
 ---
 
+### Issue Routes — Protected (requires `pm.auth` cookie)
+
+All issue operations are **owner-only**. A user can only access issues within projects that belong to their workspace.
+
+#### `GET /issue/{workspaceSlug}/{projectId}`
+
+List all issues for a project.
+
+**Path params:**
+- `workspaceSlug` — slug of the workspace
+- `projectId` — UUID of the project
+
+**Response body (`200`):**
+```json
+[
+  {
+    "id": "uuid",
+    "title": "string",
+    "description": "string | null",
+    "status": "OPEN | IN_PROGRESS | DONE | CANCELLED",
+    "createdAt": "ISO-8601",
+    "updatedAt": "ISO-8601"
+  }
+]
+```
+
+**Responses:**
+| Status | Meaning |
+|--------|---------|
+| `200` | Returns array of issues (empty array if none) |
+| `401` | Not authenticated or not the workspace owner |
+| `404` | Workspace or project not found |
+
+---
+
+#### `GET /issue/{workspaceSlug}/{projectId}/{issueId}`
+
+Fetch a single issue by ID.
+
+**Path params:**
+- `workspaceSlug` — slug of the workspace
+- `projectId` — UUID of the project
+- `issueId` — UUID of the issue
+
+**Response body (`200`):**
+```json
+{
+  "id": "uuid",
+  "title": "string",
+  "description": "string | null",
+  "status": "OPEN | IN_PROGRESS | DONE | CANCELLED",
+  "createdAt": "ISO-8601",
+  "updatedAt": "ISO-8601"
+}
+```
+
+**Responses:**
+| Status | Meaning |
+|--------|---------|
+| `200` | Issue found |
+| `401` | Not authenticated or not the workspace owner |
+| `404` | Workspace, project, or issue not found |
+
+---
+
+#### `POST /issue/{workspaceSlug}/{projectId}`
+
+Create a new issue in the project. Status is always set to `OPEN` automatically.
+
+**Path params:**
+- `workspaceSlug` — slug of the workspace
+- `projectId` — UUID of the project
+
+**Request body:**
+```json
+{
+  "title": "string",       // required — min 2, max 100 chars
+  "description": "string"  // optional
+}
+```
+
+**Response body:** None — `201` with empty body.
+
+**Responses:**
+| Status | Meaning |
+|--------|---------|
+| `201` | Issue created (no body) |
+| `400` | Validation error |
+| `401` | Not authenticated or not the workspace owner |
+| `404` | Workspace or project not found |
+
+---
+
+#### `PUT /issue/{workspaceSlug}/{projectId}/{issueId}`
+
+Update an issue's title, description, and/or status.
+
+**Path params:**
+- `workspaceSlug` — slug of the workspace
+- `projectId` — UUID of the project
+- `issueId` — UUID of the issue
+
+**Request body:**
+```json
+{
+  "title": "string",                                    // required — min 2, max 100 chars
+  "description": "string",                              // optional
+  "status": "OPEN | IN_PROGRESS | DONE | CANCELLED"    // optional — omit to keep current
+}
+```
+
+**Response body (`200`):** Same as `GET /issue/{workspaceSlug}/{projectId}/{issueId}`
+
+**Responses:**
+| Status | Meaning |
+|--------|---------|
+| `200` | Updated — returns updated issue data |
+| `400` | Validation error |
+| `401` | Not authenticated or not the workspace owner |
+| `404` | Workspace, project, or issue not found |
+
+---
+
+#### `DELETE /issue/{workspaceSlug}/{projectId}/{issueId}`
+
+Delete an issue.
+
+**Path params:**
+- `workspaceSlug` — slug of the workspace
+- `projectId` — UUID of the project
+- `issueId` — UUID of the issue
+
+**Responses:**
+| Status | Meaning |
+|--------|---------|
+| `200` | Deleted successfully |
+| `401` | Not authenticated or not the workspace owner |
+| `404` | Workspace, project, or issue not found |
+
+---
+
 ## Data Models
 
 ### User
@@ -424,17 +565,35 @@ Delete a project.
 
 ---
 
+### Issue
+
+| Field | Type | Notes |
+|-------|------|-------|
+| `issueId` | UUID | Primary key |
+| `title` | String | Issue title |
+| `description` | String | Optional description |
+| `status` | Enum | `OPEN`, `IN_PROGRESS`, `DONE`, `CANCELLED` |
+| `project` | Project | Parent project (cascade delete) |
+| `createdAt` | Instant | Auto-set |
+| `updatedAt` | Instant | Auto-set |
+
+---
+
 ## Entity Relationships
 
 ```
 User (1) ──── (many) Workspace
                           │
                      (many) Project
+                               │
+                          (many) Issue
 ```
 
 - A user owns multiple workspaces
 - A workspace contains multiple projects
+- A project contains multiple issues
 - Deleting a workspace cascades to its projects
+- Deleting a project cascades to its issues
 - Deleting a user cascades to their workspaces
 
 ---
@@ -453,7 +612,7 @@ Passwords must contain:
 
 - **PostgreSQL** on `localhost:5432`
 - Database name: `project_management`
-- Tables: `tb_users`, `tb_workspaces`, `tb_projects`
+- Tables: `tb_users`, `tb_workspaces`, `tb_projects`, `tb_issues`
 - All IDs are UUIDs
 
 ---
