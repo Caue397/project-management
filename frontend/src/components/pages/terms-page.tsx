@@ -55,21 +55,14 @@ function TermsNav() {
           <span className="font-bold text-sm tracking-tight hidden sm:inline">Project Management</span>
         </div>
 
-        <div className="flex items-center gap-3 ml-auto">
+        <div className="flex items-center gap-4 ml-auto">
           <Dropdown
             options={localeOptions}
             value={currentLocale}
             onChange={handleLanguageChange}
             icon={<LuLanguages size={15} />}
-            className="w-[130px]"
+            className="w-40"
           />
-          <Link
-            href="/"
-            className="inline-flex items-center gap-1.5 text-sm text-foreground/60 hover:text-foreground transition-colors whitespace-nowrap"
-          >
-            <LuArrowLeft size={15} />
-            <span className="hidden sm:inline">{t('nav.backToHome')}</span>
-          </Link>
         </div>
       </div>
     </header>
@@ -82,7 +75,14 @@ function PageHero() {
   return (
     <div className="bg-white border-b border-foreground/10 py-10 px-4 sm:px-6">
       <div className="max-w-3xl mx-auto">
-        <h1 className="text-3xl font-bold text-foreground tracking-tight">{t('title')}</h1>
+        <Link
+          href="/"
+          className="inline-flex items-center gap-1.5 text-sm text-foreground/60 hover:text-foreground transition-colors whitespace-nowrap"
+        >
+          <LuArrowLeft size={15} />
+          <span className="hidden sm:inline">{t('nav.backToHome')}</span>
+        </Link>
+        <h1 className="text-3xl mt-2 font-bold text-foreground tracking-tight">{t('title')}</h1>
         <p className="text-foreground/60 mt-2 text-sm">{t('subtitle')}</p>
         <span className="inline-flex items-center gap-1.5 text-xs text-foreground/40 mt-3">
           <LuCalendar size={12} />
