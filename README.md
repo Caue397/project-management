@@ -21,19 +21,30 @@ Este MVP resolve esse problema oferecendo um ambiente de **workspace** onde o us
 ### Workspace
 - Criar workspace
 - Visualizar workspaces do usuário
+- Editar nome da workspace
+- Deletar workspace
+- Alterar idioma da interface (Português, English, Español)
 
 ### Projetos
 - Criar projeto dentro de uma workspace
 - Listar projetos da workspace
 - Visualizar detalhes de um projeto
 - Alterar status do projeto seguindo o fluxo: `CREATED` → `IN_PROGRESS` → `DONE` → `ARCHIVED`
+- Deletar projeto
+
+### Issues
+- Criar issue dentro de um projeto
+- Listar issues do projeto
+- Alterar status da issue: `OPEN`, `IN_PROGRESS`, `DONE`, `CANCELLED`
+- Deletar issue
 
 ### Regras de Negócio
 - Projeto começa obrigatoriamente em `CREATED`
-- O status só pode avançar na ordem correta — não é permitido pular etapas
+- O status do projeto só pode avançar na ordem correta — não é permitido pular etapas
 - Um projeto com status `ARCHIVED` não pode mais ser alterado
 - O nome do projeto é obrigatório
-- Usuário só acessa sua própria workspace e seus próprios projetos
+- O título da issue é obrigatório (mín. 2, máx. 100 caracteres); descrição é opcional
+- Usuário só acessa sua própria workspace, seus projetos e as issues dos seus projetos
 
 ---
 
@@ -53,6 +64,7 @@ Este MVP resolve esse problema oferecendo um ambiente de **workspace** onde o us
 | Framer Motion | 12.29.2 | Animações |
 | Axios | 1.13.5 | Cliente HTTP |
 | React Icons | 5.5.0 | Ícones |
+| next-intl | 4.8.3 | Internacionalização (i18n) |
 
 **Package Manager:** [Bun](https://bun.sh)
 
@@ -97,6 +109,10 @@ A aplicação segue uma arquitetura **cliente-servidor** desacoplada:
 ```
 project-management-mvp/
 ├── frontend/                          # Aplicação Next.js
+│   ├── messages/                      # Traduções (next-intl)
+│   │   ├── pt.json                    # Português (padrão)
+│   │   ├── en.json                    # Inglês
+│   │   └── es.json                    # Espanhol
 │   └── src/
 │       ├── app/                       # Next.js App Router
 │       │   ├── (auth)/
@@ -105,30 +121,33 @@ project-management-mvp/
 │       │   ├── workspace/
 │       │   │   └── [workspace]/
 │       │   │       ├── layout.tsx     # Layout com sidebar
-│       │   │       ├── page.tsx       # Dashboard da workspace
-│       │   │       ├── settings/      # Configurações da workspace
-│       │   │       └── [project]/     # Detalhes do projeto
-│       │   ├── layout.tsx             # Layout raiz com providers
+│       │   │       ├── page.tsx       # Dashboard da workspace (lista projetos)
+│       │   │       ├── settings/      # Configurações: nome, idioma, deletar
+│       │   │       └── [project]/
+│       │   │           └── page.tsx   # Detalhes do projeto + issues
+│       │   ├── layout.tsx             # Layout raiz com providers (next-intl + React Query)
 │       │   └── page.tsx               # Página inicial
 │       ├── components/
-│       │   ├── layout/                # Sidebar, estrutura de layout
+│       │   ├── layout/                # Sidebar (i18n-ready)
 │       │   ├── pages/                 # Componentes de página
-│       │   └── ui/                    # Componentes reutilizáveis (Button, Input, Dialog, Table)
+│       │   └── ui/                    # Button, Input, Dropdown, Dialog, Toast, Table, Loader
+│       ├── i18n/
+│       │   └── request.ts             # Configuração next-intl (lê cookie NEXT_LOCALE)
 │       ├── network/
 │       │   ├── network.ts             # Instância Axios configurada
-│       │   ├── queries/               # Queries para Client Components (React Query)
-│       │   └── ssr/                   # Prefetch para Server Components
-│       ├── schemas/                   # Schemas de validação Zod
-│       ├── libs/                      # Utilitários (merge-classname, promise-status, string)
-│       └── providers/                 # Providers globais (React Query)
+│       │   ├── queries/               # workspace.ts, project.ts, issue.ts
+│       │   └── ssr/                   # workspace.ts, project.ts, issue.ts
+│       ├── schemas/                   # workspace-schema, project-schema, issue-schema
+│       ├── libs/                      # cn, slugify, usePromiseStatus, getApiErrorMessage
+│       └── providers/                 # QueryClientProvider + ToastProvider
 │
 └── backend/                           # Aplicação Spring Boot
     └── src/main/java/dev/cauegallizzi/backend/
         ├── config/                    # SecurityConfig, CORS
-        ├── controller/                # AuthController, WorkspaceController, ProjectController
-        ├── service/                   # AuthService, WorkspaceService, ProjectService, JwtService
-        ├── repository/                # UserRepository, WorkspaceRepository, ProjectRepository
-        ├── entity/                    # User, Workspace, Project + enums
+        ├── controller/                # AuthController, WorkspaceController, ProjectController, IssueController
+        ├── service/                   # AuthService, WorkspaceService, ProjectService, IssueService, JwtService
+        ├── repository/                # UserRepository, WorkspaceRepository, ProjectRepository, IssueRepository
+        ├── entity/                    # User, Workspace, Project, Issue + enums
         ├── dto/                       # DTOs de request e response
         ├── filter/                    # JwtAuthenticationFilter
         └── util/                      # CookieUtil, StringUtil
@@ -166,6 +185,16 @@ project-management-mvp/
 | `POST` | `/project/{workspaceSlug}` | Cria um novo projeto |
 | `PUT` | `/project/{workspaceSlug}/{projectId}` | Atualiza um projeto (inclui mudança de status) |
 | `DELETE` | `/project/{workspaceSlug}/{projectId}` | Remove um projeto |
+
+### Issues — `/issue`
+
+| Método | Rota | Descrição |
+|---|---|---|
+| `GET` | `/issue/{workspaceSlug}/{projectId}` | Lista todas as issues do projeto |
+| `GET` | `/issue/{workspaceSlug}/{projectId}/{issueId}` | Retorna uma issue específica |
+| `POST` | `/issue/{workspaceSlug}/{projectId}` | Cria uma nova issue |
+| `PUT` | `/issue/{workspaceSlug}/{projectId}/{issueId}` | Atualiza uma issue (título, descrição ou status) |
+| `DELETE` | `/issue/{workspaceSlug}/{projectId}/{issueId}` | Remove uma issue |
 
 ---
 

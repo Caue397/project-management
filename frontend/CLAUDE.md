@@ -26,6 +26,7 @@ Pequenas equipes precisam de uma forma simples de organizar projetos e acompanha
 | Tailwind CSS | 4 | Estilização utility-first |
 | Framer Motion | 12.29.2 | Animações |
 | React Icons | 5.5.0 | Ícones |
+| next-intl | 4.8.3 | Internacionalização (i18n) |
 
 **Package Manager:** Bun
 
@@ -177,7 +178,8 @@ Queries usadas em componentes cliente ficam em `src/network/queries/`, organizad
 src/network/queries/
 ├── auth.ts
 ├── workspace.ts
-└── project.ts
+├── project.ts
+└── issue.ts
 ```
 
 **Convenção de nomes:**
@@ -216,7 +218,8 @@ Prefetch de dados em Server Components fica em `src/network/ssr/`, também organ
 src/network/ssr/
 ├── auth.ts
 ├── workspace.ts
-└── project.ts
+├── project.ts
+└── issue.ts
 ```
 
 Padrão obrigatório — recebe o `QueryClient` e o contexto necessário (ex: `slug`), serializa os cookies para repassar ao servidor e usa `client.fetchQuery`:
@@ -244,24 +247,92 @@ export async function ssrWorkspace(client: QueryClient, slug: string) {
 
 ---
 
+## Internacionalização (i18n)
+
+Implementado com **next-intl v4** usando a estratégia **"without i18n routing"** — sem prefixo de idioma na URL, sem middleware. O idioma é detectado via cookie.
+
+### Idiomas Suportados
+
+| Código | Idioma | Padrão |
+|--------|--------|--------|
+| `pt` | Português | ✅ |
+| `en` | English | |
+| `es` | Español | |
+
+### Arquitetura
+
+- **Cookie:** `NEXT_LOCALE` (SameSite=Lax, max-age=1 ano, path=/)
+- **Config:** `src/i18n/request.ts` — lê o cookie e importa as mensagens dinamicamente
+- **Plugin:** `next.config.ts` envolvido com `createNextIntlPlugin()`
+- **Provider:** `NextIntlClientProvider` no root layout (`src/app/layout.tsx`), envolve o `ClientProvider`
+- **Mensagens:** `messages/{pt,en,es}.json` na raiz do projeto
+
+### Namespaces das Mensagens
+
+| Namespace | Uso |
+|-----------|-----|
+| `common` | Botões e ações reutilizáveis (save, cancel, delete…) |
+| `settings` | Página de configurações da workspace |
+| `sidebar` | Labels de navegação da sidebar |
+| `locales` | Nomes nativos de cada idioma (idênticos nos 3 arquivos) |
+
+### Como Usar em Componentes Cliente
+
+```typescript
+import { useTranslations, useLocale } from 'next-intl';
+
+const t = useTranslations('settings');
+const locale = useLocale(); // 'pt' | 'en' | 'es'
+
+<h1>{t('title')}</h1>
+```
+
+### Como Mudar o Idioma
+
+```typescript
+// Setar cookie e forçar re-render (sem reload completo)
+document.cookie = `NEXT_LOCALE=${locale}; path=/; max-age=31536000; SameSite=Lax`;
+router.refresh();
+```
+
+### Como Adicionar Traduções a Novas Páginas
+
+1. Adicionar as chaves nos 3 arquivos `messages/*.json` sob um novo namespace
+2. Usar `useTranslations('meuNamespace')` no componente cliente
+3. Substituir strings hardcoded por `t('chave')`
+
+---
+
 ## Funcionalidades do MVP
 
 ### Autenticação
-- [ ] Criar conta
-- [ ] Login
-- [ ] Logout
+- [x] Criar conta
+- [x] Login
+- [x] Logout
 
 ### Workspace
-- [ ] Criar workspace
-- [ ] Visualizar workspace do usuário
+- [x] Criar workspace
+- [x] Visualizar workspaces do usuário
+- [x] Editar nome da workspace (página de configurações)
+- [x] Deletar workspace
+- [x] Alterar idioma da interface (Português, English, Español)
 
 ### Projetos
-- [ ] Criar projeto
-- [ ] Listar projetos da workspace
-- [ ] Alterar status do projeto
-- [ ] Visualizar detalhes do projeto
+- [x] Criar projeto
+- [x] Listar projetos da workspace
+- [x] Alterar status do projeto
+- [x] Visualizar detalhes do projeto
+- [x] Deletar projeto
 
 **Status disponíveis:** `CREATED` → `IN_PROGRESS` → `DONE` → `ARCHIVED`
+
+### Issues
+- [x] Criar issue dentro de um projeto
+- [x] Listar issues do projeto
+- [x] Alterar status da issue
+- [x] Deletar issue
+
+**Status disponíveis:** `OPEN` → `IN_PROGRESS` → `DONE` → `CANCELLED`
 
 ---
 
@@ -273,9 +344,17 @@ export async function ssrWorkspace(client: QueryClient, slug: string) {
 - Projeto `ARCHIVED` não pode ser alterado
 - Nome do projeto é obrigatório
 
+### Issues
+- Issue começa em `OPEN`
+- Status pode ser alterado para qualquer valor (`OPEN`, `IN_PROGRESS`, `DONE`, `CANCELLED`)
+- Título é obrigatório (mín. 2, máx. 100 caracteres)
+- Descrição é opcional
+- Issue pertence a um projeto, que pertence a uma workspace
+
 ### Segurança
 - Usuário só acessa sua própria workspace
 - Usuário só acessa projetos da sua workspace
+- Usuário só acessa issues dos seus projetos
 
 ---
 
@@ -283,25 +362,40 @@ export async function ssrWorkspace(client: QueryClient, slug: string) {
 
 ```
 frontend/
+├── messages/                     # Arquivos de tradução (next-intl)
+│   ├── pt.json                   # Português (padrão)
+│   ├── en.json                   # Inglês
+│   └── es.json                   # Espanhol
 ├── src/
 │   ├── app/                      # Next.js App Router
 │   │   ├── (auth)/               # Rotas de autenticação
 │   │   │   ├── sign-in/          # Página de login
 │   │   │   └── sign-up/          # Página de cadastro
-│   │   ├── [workspace]/          # Rotas dinâmicas de workspace
-│   │   │   ├── layout.tsx        # Layout da workspace
-│   │   │   ├── page.tsx          # Dashboard da workspace
-│   │   │   └── [project]/        # Rotas de projeto
-│   │   │       └── page.tsx      # Detalhes do projeto
-│   │   ├── layout.tsx            # Layout raiz
+│   │   ├── workspace/
+│   │   │   └── [workspace]/
+│   │   │       ├── layout.tsx    # Layout com sidebar
+│   │   │       ├── page.tsx      # Dashboard da workspace (lista projetos)
+│   │   │       ├── settings/     # Configurações: nome, idioma, deletar
+│   │   │       └── [project]/
+│   │   │           └── page.tsx  # Detalhes do projeto + issues
+│   │   ├── layout.tsx            # Layout raiz (NextIntlClientProvider + ClientProvider)
 │   │   ├── page.tsx              # Home/Landing
 │   │   └── globals.css           # Estilos globais
 │   ├── components/
-│   │   ├── layout/               # Componentes de layout
-│   │   └── ui/                   # Componentes UI reutilizáveis
+│   │   ├── layout/               # Sidebar (i18n-ready)
+│   │   ├── pages/                # Componentes de página (workspaces-page)
+│   │   └── ui/                   # Button, Input, Dropdown, Dialog, Toast, Table, Loader
 │   ├── fonts/                    # Configuração de fontes
-│   ├── libs/                     # Utilitários e helpers
-│   └── network/                  # Cliente API e chamadas de rede
+│   ├── i18n/
+│   │   └── request.ts            # getRequestConfig — lê cookie NEXT_LOCALE
+│   ├── libs/                     # cn, slugify, usePromiseStatus, getApiErrorMessage
+│   ├── network/
+│   │   ├── network.ts            # Instância Axios
+│   │   ├── queries/              # workspace.ts, project.ts, issue.ts
+│   │   └── ssr/                  # workspace.ts, project.ts, issue.ts
+│   ├── providers/
+│   │   └── client.tsx            # QueryClientProvider + ToastProvider
+│   └── schemas/                  # workspace-schema, project-schema, issue-schema
 ├── documents/                    # Documentação do projeto
 └── public/                       # Assets estáticos
 ```
@@ -367,18 +461,42 @@ bun lint
 
 ---
 
+## API — Endpoints do Frontend
+
+Rotas consumidas pelo frontend via `src/network/`:
+
+### Issues — `/issue`
+
+| Método | Rota | Função |
+|--------|------|--------|
+| `GET` | `/issue/{workspaceSlug}/{projectId}` | `issuesQuery(slug, projectId)` |
+| `GET` | `/issue/{workspaceSlug}/{projectId}/{issueId}` | `issueQuery(slug, projectId, issueId)` |
+| `POST` | `/issue/{workspaceSlug}/{projectId}` | Criar issue |
+| `PUT` | `/issue/{workspaceSlug}/{projectId}/{issueId}` | Atualizar status/título |
+| `DELETE` | `/issue/{workspaceSlug}/{projectId}/{issueId}` | Deletar issue |
+
+**Schema da issue:**
+```typescript
+// src/schemas/issue-schema.ts
+const issueStatusValues = ['OPEN', 'IN_PROGRESS', 'DONE', 'CANCELLED'];
+
+const createIssueSchema = z.object({
+  title: z.string().min(2).max(100),
+  description: z.string().optional(),
+});
+```
+
+---
+
 ## Status do Desenvolvimento
 
-O projeto está em **fase inicial de configuração**. A estrutura base está configurada com:
+Funcionalidades implementadas:
 
-- Roteamento definido
-- Configuração de estilos (Tailwind + tema claro/escuro)
-- TypeScript strict mode
-- Dependências instaladas
-
-**Próximos passos:**
-1. Implementar componentes UI base (Button, Input, Dialog)
-2. Configurar cliente de API (network layer)
-3. Implementar páginas de autenticação
-4. Implementar dashboard da workspace
-5. Implementar gerenciamento de projetos
+- [x] Autenticação (sign-in, sign-up, logout via JWT cookie HttpOnly)
+- [x] Workspaces (criar, listar, editar nome, deletar)
+- [x] Projetos (criar, listar, alterar status, visualizar, deletar)
+- [x] Issues (criar, listar, alterar status, deletar) — dentro da página do projeto
+- [x] Configurações de workspace (nome + deletar)
+- [x] Sistema de idiomas (Português, English, Español via next-intl + cookie)
+- [x] Componentes UI (Button, Input, Dropdown, Dialog, Toast, Table, Loader)
+- [x] Sidebar com troca de workspace e navegação i18n-ready
