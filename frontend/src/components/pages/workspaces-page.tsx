@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import Link from 'next/link';
+import { useTranslations } from 'next-intl';
 import { LuPlus, LuFolder } from 'react-icons/lu';
 import { Dialog, DialogContent, DialogHeader, DialogBody, DialogFooter } from '@/components/ui/dialog';
 import Button from '@/components/ui/button';
@@ -15,11 +16,16 @@ import { network } from '@/network/network';
 import { workspacesQuery } from '@/network/queries/workspace';
 import { CreateWorkspaceForm, createWorkspaceSchema } from '@/schemas/workspace-schema';
 import { slugify } from '@/libs/string';
+import { useToast } from '@/components/ui/toast';
+import { getApiErrorMessage } from '@/libs/api-error';
 
 export default function WorkspacesPage() {
   const [isOpen, setIsOpen] = useState(false);
   const router = useRouter();
   const queryClient = useQueryClient();
+  const { addToast } = useToast();
+  const t = useTranslations('workspaces');
+  const tCommon = useTranslations('common');
 
   const { data: workspaces } = useSuspenseQuery(workspacesQuery());
 
@@ -33,17 +39,22 @@ export default function WorkspacesPage() {
     defaultValues: { name: '' },
   });
 
-  const { loading, exec } = usePromiseStatus(async (data: CreateWorkspaceForm) => {
-    await network.post('/workspace', data);
-    const slug = slugify(data.name);
-    await queryClient.invalidateQueries({ queryKey: ['workspaces'] });
-    reset();
-    setIsOpen(false);
-    router.push(`/workspace/${slug}`);
-  });
+  const { loading, exec } = usePromiseStatus((data: CreateWorkspaceForm) =>
+    network.post('/workspace', data)
+  );
 
-  function onSubmit(data: CreateWorkspaceForm) {
-    exec(data);
+  async function onSubmit(data: CreateWorkspaceForm) {
+    try {
+      await exec(data);
+      const slug = slugify(data.name);
+      await queryClient.invalidateQueries({ queryKey: ['workspaces'] });
+      addToast({ type: 'success', message: t('successMessage') });
+      reset();
+      setIsOpen(false);
+      router.push(`/workspace/${slug}`);
+    } catch (error) {
+      addToast({ type: 'error', message: getApiErrorMessage(error) });
+    }
   }
 
   return (
@@ -51,13 +62,11 @@ export default function WorkspacesPage() {
       <header className="flex items-center border-b pb-6 border-foreground/30 border-dashed justify-between mb-8">
         <div>
           <h1 className="text-2xl font-bold text-foreground">Workspaces</h1>
-          <p className="text-sm text-foreground/60 mt-1">
-            Selecione ou crie uma workspace para começar
-          </p>
+          <p className="text-sm text-foreground/60 mt-1">{t('subtitle')}</p>
         </div>
         <Button onClick={() => setIsOpen(true)}>
           <LuPlus size={18} />
-          Nova Workspace
+          {t('newWorkspace')}
         </Button>
       </header>
 
@@ -66,10 +75,8 @@ export default function WorkspacesPage() {
           <div className="w-14 h-14 rounded-2xl bg-foreground/[0.04] border border-foreground/10 flex items-center justify-center text-foreground/30 mb-4">
             <LuFolder size={24} />
           </div>
-          <p className="text-sm font-medium text-foreground/60">Nenhuma workspace encontrada</p>
-          <p className="text-xs text-foreground/40 mt-1">
-            Crie sua primeira workspace para começar
-          </p>
+          <p className="text-sm font-medium text-foreground/60">{t('empty.title')}</p>
+          <p className="text-xs text-foreground/40 mt-1">{t('empty.subtitle')}</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -96,17 +103,15 @@ export default function WorkspacesPage() {
       <Dialog open={isOpen} close={() => setIsOpen(false)}>
         <DialogContent>
           <DialogHeader>
-            <h2 className="text-base font-semibold text-foreground">Nova Workspace</h2>
-            <p className="text-sm text-foreground/50 mt-0.5">
-              Dê um nome para identificar sua workspace
-            </p>
+            <h2 className="text-base font-semibold text-foreground">{t('dialog.title')}</h2>
+            <p className="text-sm text-foreground/50 mt-0.5">{t('dialog.subtitle')}</p>
           </DialogHeader>
 
           <DialogBody>
             <form id="create-workspace-form" onSubmit={handleSubmit(onSubmit)}>
               <Input
-                label="Nome"
-                placeholder="Minha Workspace"
+                label={t('dialog.nameLabel')}
+                placeholder={t('dialog.namePlaceholder')}
                 icon={<LuFolder size={18} />}
                 error={errors.name?.message}
                 {...register('name')}
@@ -120,14 +125,14 @@ export default function WorkspacesPage() {
               onClick={() => { setIsOpen(false); reset(); }}
               disabled={loading}
             >
-              Cancelar
+              {tCommon('cancel')}
             </Button>
             <Button
               type="submit"
               form="create-workspace-form"
               disabled={loading}
             >
-              {loading ? 'Criando...' : 'Criar'}
+              {loading ? t('dialog.creating') : t('dialog.create')}
             </Button>
           </DialogFooter>
         </DialogContent>

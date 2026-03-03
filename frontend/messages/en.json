@@ -1,0 +1,185 @@
+{
+  "common": {
+    "save": "Save",
+    "saving": "Saving...",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "deleting": "Deleting..."
+  },
+  "settings": {
+    "title": "Settings",
+    "subtitle": "Manage workspace settings",
+    "workspaceName": {
+      "title": "Workspace Name",
+      "subtitle": "Change your workspace name. The slug will be updated automatically.",
+      "label": "Name",
+      "placeholder": "My Workspace",
+      "successMessage": "Workspace updated successfully!"
+    },
+    "language": {
+      "title": "Language",
+      "subtitle": "Choose the interface language.",
+      "label": "Interface Language",
+      "success": "Language changed successfully!"
+    },
+    "danger": {
+      "title": "Danger Zone",
+      "subtitle": "Irreversible actions. Be careful before proceeding.",
+      "deleteLabel": "Delete workspace",
+      "deleteDescription": "All projects will be permanently deleted.",
+      "deleteButton": "Delete",
+      "deleteSuccess": "Workspace deleted successfully!"
+    },
+    "deleteDialog": {
+      "title": "Delete Workspace",
+      "subtitle": "This action cannot be undone.",
+      "confirmInstructions": "To confirm, type",
+      "confirmBelow": "below:",
+      "deleteButton": "Delete Workspace"
+    }
+  },
+  "sidebar": {
+    "navigation": "Navigation",
+    "home": "Home",
+    "projects": "Projects",
+    "noProjects": "No projects...",
+    "settings": "Settings",
+    "newWorkspace": "New Workspace",
+    "logout": "Sign out",
+    "loggingOut": "Signing out..."
+  },
+  "locales": {
+    "pt": "Português",
+    "en": "English",
+    "es": "Español"
+  },
+  "workspaces": {
+    "subtitle": "Select or create a workspace to get started",
+    "newWorkspace": "New Workspace",
+    "empty": {
+      "title": "No workspaces found",
+      "subtitle": "Create your first workspace to get started"
+    },
+    "dialog": {
+      "title": "New Workspace",
+      "subtitle": "Give a name to identify your workspace",
+      "nameLabel": "Name",
+      "namePlaceholder": "My Workspace",
+      "creating": "Creating...",
+      "create": "Create"
+    },
+    "successMessage": "Workspace created successfully!"
+  },
+  "projects": {
+    "subtitle": "Manage all projects in your workspace",
+    "newProject": "New Project",
+    "empty": {
+      "title": "No projects found",
+      "subtitle": "Create your first project to get started"
+    },
+    "table": {
+      "project": "Project",
+      "status": "Status",
+      "createdAt": "Created at",
+      "updatedAt": "Updated at",
+      "actions": "Actions"
+    },
+    "status": {
+      "CREATED": "New",
+      "IN_PROGRESS": "In Progress",
+      "DONE": "Done",
+      "ARCHIVED": "Archived"
+    },
+    "dialog": {
+      "title": "New Project",
+      "subtitle": "Create a new project in this workspace",
+      "titleLabel": "Title",
+      "titlePlaceholder": "My Project",
+      "descriptionLabel": "Description",
+      "descriptionPlaceholder": "A brief description of the project (optional)",
+      "creating": "Creating...",
+      "create": "Create"
+    },
+    "actions": {
+      "view": "View details",
+      "edit": "Edit project",
+      "delete": "Delete project"
+    },
+    "successMessage": "Project created successfully!"
+  },
+  "project": {
+    "backToProjects": "Back to projects",
+    "createdAt": "Created at",
+    "editButton": "Edit Project",
+    "statusUpdated": "Status updated successfully!",
+    "updated": "Project updated successfully!",
+    "status": {
+      "CREATED": "New",
+      "IN_PROGRESS": "In Progress",
+      "DONE": "Done",
+      "ARCHIVED": "Archived"
+    },
+    "tabs": {
+      "overview": "Overview",
+      "issues": "Issues"
+    },
+    "overview": {
+      "description": "Description",
+      "createdAt": "Created at",
+      "updatedAt": "Last updated"
+    },
+    "editDialog": {
+      "title": "Edit Project",
+      "subtitle": "Update the title or description of the project",
+      "titleLabel": "Title",
+      "titlePlaceholder": "Project name",
+      "descriptionLabel": "Description",
+      "descriptionPlaceholder": "Project description (optional)",
+      "saving": "Saving...",
+      "save": "Save"
+    },
+    "issues": {
+      "newIssue": "New Issue",
+      "empty": {
+        "title": "No issues found",
+        "subtitle": "Create your first issue to start tracking work"
+      },
+      "table": {
+        "issue": "Issue",
+        "status": "Status",
+        "createdAt": "Created at",
+        "actions": "Actions"
+      },
+      "issueStatus": {
+        "OPEN": "Open",
+        "IN_PROGRESS": "In Progress",
+        "DONE": "Done",
+        "CANCELLED": "Cancelled"
+      },
+      "createDialog": {
+        "title": "New Issue",
+        "subtitle": "Add an issue to this project",
+        "titleLabel": "Title",
+        "titlePlaceholder": "Describe the problem or task",
+        "descriptionLabel": "Description",
+        "descriptionPlaceholder": "Additional context (optional)",
+        "creating": "Creating...",
+        "create": "Create Issue"
+      },
+      "editDialog": {
+        "title": "Edit Issue",
+        "subtitle": "Update the title or description of this issue",
+        "titleLabel": "Title",
+        "titlePlaceholder": "Describe the problem or task",
+        "descriptionLabel": "Description",
+        "descriptionPlaceholder": "Additional context (optional)",
+        "saving": "Saving...",
+        "save": "Save"
+      },
+      "created": "Issue created successfully!",
+      "updated": "Issue updated successfully!",
+      "deleted": "Issue deleted successfully!",
+      "statusUpdated": "Status updated successfully!"
+    }
+  }
+}

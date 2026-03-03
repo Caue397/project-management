@@ -13,6 +13,7 @@ import { useClickAway } from '@uidotdev/usehooks';
 import { LuFolder, LuSettings, LuLogOut, LuPlus, LuChevronsUpDown, LuCheck } from 'react-icons/lu';
 import { HiFolder, HiHome } from 'react-icons/hi';
 import { IoSettings } from 'react-icons/io5';
+import { useTranslations } from 'next-intl';
 
 interface SidebarProps {
   workspaceName: string;
@@ -23,6 +24,7 @@ interface SidebarProps {
 export default function Sidebar({ workspaceName, workspaceSlug, projects }: SidebarProps) {
   const pathname = usePathname();
   const router = useRouter();
+  const t = useTranslations('sidebar');
 
   const { loading: loggingOut, exec: logout } = usePromiseStatus(async () => {
     await network.post('/auth/sign-out');
@@ -34,19 +36,19 @@ export default function Sidebar({ workspaceName, workspaceSlug, projects }: Side
       <WorkspaceSwitcher currentName={workspaceName} currentSlug={workspaceSlug} />
 
       <nav className="flex-1 p-4 space-y-6 overflow-y-auto">
-        <SidebarCategory name='Navegação'>
+        <SidebarCategory name={t('navigation')}>
           <NavItem
-            name="Home"
+            name={t('home')}
             href={`/workspace/${workspaceSlug}`}
             icon={<HiHome size={18} />}
             isActive={pathname === `/workspace/${workspaceSlug}`}
           />
         </SidebarCategory>
-        <SidebarCategory name="Projetos">
+        <SidebarCategory name={t('projects')}>
           {projects.length === 0 ? (
             <p className="text-xs flex items-center gap-4 border border-dashed rounded-lg text-foreground/50 px-2 py-3">
               <HiFolder size={18} />
-              Nenhum projeto...
+              {t('noProjects')}
             </p>
           ) : (
             projects.map((project) => (
@@ -62,9 +64,9 @@ export default function Sidebar({ workspaceName, workspaceSlug, projects }: Side
           )}
         </SidebarCategory>
 
-        <SidebarCategory name="Configuracoes">
+        <SidebarCategory name={t('settings')}>
           <NavItem
-            name="Settings"
+            name={t('settings')}
             href={`/workspace/${workspaceSlug}/settings`}
             icon={<IoSettings size={18} />}
             isActive={pathname.includes('/settings')}
@@ -79,7 +81,7 @@ export default function Sidebar({ workspaceName, workspaceSlug, projects }: Side
           className="flex cursor-pointer items-center gap-3 w-full py-2 px-2 rounded-xl text-foreground/50 hover:bg-red-50 hover:text-red-600 transition-colors disabled:opacity-50"
         >
           <LuLogOut size={18} />
-          <span className="text-sm font-medium">{loggingOut ? 'Saindo...' : 'Sair'}</span>
+          <span className="text-sm font-medium">{loggingOut ? t('loggingOut') : t('logout')}</span>
         </button>
       </div>
     </aside>
@@ -90,6 +92,7 @@ function WorkspaceSwitcher({ currentName, currentSlug }: { currentName: string; 
   const [open, setOpen] = useState(false);
   const router = useRouter();
   const ref = useClickAway<HTMLDivElement>(() => setOpen(false));
+  const t = useTranslations('sidebar');
 
   const { data: workspaces } = useSuspenseQuery(workspacesQuery());
 
@@ -151,7 +154,7 @@ function WorkspaceSwitcher({ currentName, currentSlug }: { currentName: string; 
                 className="flex items-center gap-2 w-full px-3 py-2 rounded-lg text-sm text-foreground/50 hover:bg-foreground/[0.04] hover:text-foreground transition-colors"
               >
                 <LuPlus size={14} />
-                Nova Workspace
+                {t('newWorkspace')}
               </Link>
             </div>
           </motion.div>
