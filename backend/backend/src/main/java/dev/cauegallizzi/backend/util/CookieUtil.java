@@ -15,6 +15,9 @@ public class CookieUtil {
     @Value("${jwt.cookie.expiration}")
     private int expiration;
 
+    @Value("${cookie.secure:false}")
+    private boolean cookieSecure;
+
     public String extractToken(HttpServletRequest request) {
         if (request.getCookies() == null) return null;
 
@@ -30,7 +33,7 @@ public class CookieUtil {
     public void createAuthCookie(HttpServletResponse response, String token) {
         Cookie cookie = new Cookie(cookieName, token);
         cookie.setHttpOnly(true);
-        cookie.setSecure(false);
+        cookie.setSecure(cookieSecure);
         cookie.setPath("/");
         cookie.setMaxAge(expiration);
         response.addCookie(cookie);
@@ -39,11 +42,9 @@ public class CookieUtil {
     public void deleteAuthCookie(HttpServletResponse response) {
         Cookie cookie = new Cookie(cookieName, null);
         cookie.setHttpOnly(true);
-        cookie.setSecure(false);
+        cookie.setSecure(cookieSecure);
         cookie.setPath("/");
         cookie.setMaxAge(0);
         response.addCookie(cookie);
     }
-
-
 }
