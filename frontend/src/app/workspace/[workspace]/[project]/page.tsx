@@ -23,6 +23,7 @@ import {
   LuMousePointerClick,
   LuPencil,
   LuCircleX,
+  LuEye,
 } from 'react-icons/lu';
 import Button from '@/components/ui/button';
 import Input from '@/components/ui/input';
@@ -75,6 +76,13 @@ const projectStatusIcons: Record<string, React.ReactNode> = {
   IN_PROGRESS: <LuClock size={14} />,
   DONE: <LuCircleCheck size={14} />,
   ARCHIVED: <LuArchive size={14} />,
+};
+
+const issueStatusColors: Record<string, string> = {
+  OPEN: 'bg-gray-100 text-gray-600 border-gray-200',
+  IN_PROGRESS: 'bg-blue-100 text-blue-600 border-blue-200',
+  DONE: 'bg-green-100 text-green-600 border-green-200',
+  CANCELLED: 'bg-red-50 text-red-500 border-red-200',
 };
 
 const issueStatusIcons: Record<string, React.ReactNode> = {
@@ -543,6 +551,7 @@ function IssueRow({
 }) {
   const queryClient = useQueryClient();
   const [isEditOpen, setIsEditOpen] = useState(false);
+  const [isViewOpen, setIsViewOpen] = useState(false);
   const { addToast } = useToast();
   const t = useTranslations('project');
   const tCommon = useTranslations('common');
@@ -622,7 +631,7 @@ function IssueRow({
         <TableCell>
           <p className="text-sm font-medium text-foreground">{issue.title}</p>
           {issue.description && (
-            <p className="text-xs text-foreground/50 mt-0.5 line-clamp-1">
+            <p className="text-xs text-foreground/50 mt-0.5 truncate max-w-40">
               {issue.description}
             </p>
           )}
@@ -650,6 +659,14 @@ function IssueRow({
             <Button
               variant="ghost"
               size="sm"
+              onClick={() => setIsViewOpen(true)}
+              className="p-2 text-foreground/50 hover:bg-foreground/[0.04] hover:text-foreground"
+            >
+              <LuEye size={16} />
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
               onClick={openEdit}
               className="p-2 text-foreground/50 hover:bg-foreground/[0.04] hover:text-foreground"
             >
@@ -667,6 +684,76 @@ function IssueRow({
           </div>
         </TableCell>
       </TableRow>
+
+      <Dialog open={isViewOpen} close={() => setIsViewOpen(false)}>
+        <DialogContent>
+          <DialogHeader className='flex gap-2 items-center'>
+            <h2 className="text-base font-semibold text-foreground">{issue.title}</h2>
+            <span
+              className={cn(
+                'inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-full border',
+                issueStatusColors[issue.status],
+              )}
+            >
+              {issueStatusIcons[issue.status]}
+              {t(`issues.issueStatus.${issue.status as IssueStatus}`)}
+            </span>
+          </DialogHeader>
+          <DialogBody>
+            <div className="space-y-4">
+              {issue.description && (
+                <div>
+                  <p className="text-xs font-medium text-foreground/50 uppercase tracking-wider mb-1.5">
+                    {t('overview.description')}
+                  </p>
+                  <p className="text-sm text-foreground wrap-break-word leading-relaxed">{issue.description}</p>
+                </div>
+              )}
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <p className="text-xs font-medium text-foreground/50 uppercase tracking-wider mb-1.5">
+                    {t('issues.table.createdAt')}
+                  </p>
+                  <p className="text-sm text-foreground">
+                    {new Date(issue.createdAt).toLocaleDateString(dateLocale, {
+                      day: '2-digit',
+                      month: 'long',
+                      year: 'numeric',
+                    })}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-xs font-medium text-foreground/50 uppercase tracking-wider mb-1.5">
+                    {t('overview.updatedAt')}
+                  </p>
+                  <p className="text-sm text-foreground">
+                    {new Date(issue.updatedAt).toLocaleDateString(dateLocale, {
+                      day: '2-digit',
+                      month: 'long',
+                      year: 'numeric',
+                    })}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </DialogBody>
+          <DialogFooter>
+            <Button variant="secondary" onClick={() => setIsViewOpen(false)}>
+              {tCommon('cancel')}
+            </Button>
+            <Button
+              variant="primary"
+              onClick={() => {
+                setIsViewOpen(false);
+                openEdit();
+              }}
+            >
+              <LuPencil size={14} />
+              {t('issues.editDialog.title')}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       <Dialog open={isEditOpen} close={() => setIsEditOpen(false)}>
         <DialogContent>

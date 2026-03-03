@@ -2,21 +2,29 @@
 
 import Button from '@/components/ui/button';
 import Input from '@/components/ui/input';
+import { getApiErrorMessage } from '@/libs/api-error';
+import { isAxiosError } from 'axios';
 import { usePromiseStatus } from '@/libs/promise-status';
 import { network } from '@/network/network';
 import { SignInForm, signInSchema } from '@/schemas/auth-schema';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { AnimatePresence, motion } from 'framer-motion';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { LuMail, LuLock } from 'react-icons/lu';
+import { useTranslations } from 'next-intl';
 
 export default function SignInPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const tTerms = useTranslations('terms');
+  const registered = searchParams.get('registered') === 'true';
 
   const {
     register,
     handleSubmit,
+    setError,
     formState: { errors },
   } = useForm<SignInForm>({
     resolver: zodResolver(signInSchema),
@@ -28,8 +36,16 @@ export default function SignInPage() {
     router.push('/workspace');
   });
 
-  function onSubmit(data: SignInForm) {
-    exec(data);
+  async function onSubmit(data: SignInForm) {
+    try {
+      await exec(data);
+    } catch (error) {
+      const message =
+        isAxiosError(error) && error.response?.status === 401
+          ? 'Email ou senha inválidos.'
+          : getApiErrorMessage(error);
+      setError('root', { message });
+    }
   }
 
   return (
@@ -41,6 +57,20 @@ export default function SignInPage() {
             Continue para o Project Management
           </p>
         </div>
+
+        <AnimatePresence>
+          {registered && (
+            <motion.p
+              className="text-sm text-green-600 bg-green-50 border border-green-200 rounded-xl px-4 py-3 mb-4"
+              initial={{ opacity: 0, y: -4, filter: 'blur(4px)' }}
+              animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+              exit={{ opacity: 0, y: -4, filter: 'blur(4px)' }}
+              transition={{ duration: 0.2 }}
+            >
+              Conta criada com sucesso! Faça login para continuar.
+            </motion.p>
+          )}
+        </AnimatePresence>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <Input
@@ -60,6 +90,20 @@ export default function SignInPage() {
             error={errors.password?.message}
             {...register('password')}
           />
+
+          <AnimatePresence>
+            {errors.root?.message && (
+              <motion.p
+                className="text-sm text-red-500"
+                initial={{ opacity: 0, height: 0, y: -4, filter: 'blur(4px)' }}
+                animate={{ opacity: 1, height: 'auto', y: 0, filter: 'blur(0px)' }}
+                exit={{ opacity: 0, height: 0, y: -4, filter: 'blur(4px)' }}
+                transition={{ duration: 0.2 }}
+              >
+                {errors.root.message}
+              </motion.p>
+            )}
+          </AnimatePresence>
 
           <Button type="submit" className="w-full" disabled={loading}>
             {loading ? 'Entrando...' : 'Entrar'}
@@ -85,15 +129,9 @@ export default function SignInPage() {
           </Link>
         </p>
 
-        <div className="mt-8 pt-6 border-t border-foreground/10 flex items-center justify-center gap-4 text-xs text-foreground/40">
-          <Link href="#" className="hover:text-foreground/60">
-            Ajuda
-          </Link>
-          <Link href="#" className="hover:text-foreground/60">
-            Privacidade
-          </Link>
-          <Link href="#" className="hover:text-foreground/60">
-            Termos
+        <div className="mt-8 pt-6 border-t border-foreground/10 flex items-center justify-center text-xs text-foreground/40">
+          <Link href="/terms" className="hover:text-foreground/60">
+            {tTerms('title')}
           </Link>
         </div>
       </div>

@@ -107,6 +107,142 @@
     },
     "successMessage": "¡Proyecto creado con éxito!"
   },
+  "terms": {
+    "title": "Términos y Privacidad",
+    "subtitle": "Lee con atención antes de utilizar nuestro servicio.",
+    "lastUpdated": "Última actualización: marzo de 2026",
+    "nav": {
+      "tos": "Términos de Servicio",
+      "privacy": "Política de Privacidad",
+      "backToHome": "Volver al inicio"
+    },
+    "tos": {
+      "title": "Términos de Servicio",
+      "acceptance": {
+        "title": "1. Aceptación de los Términos",
+        "content": "Al acceder o utilizar Project Management, aceptas estos Términos de Servicio. Si no estás de acuerdo con alguna parte de estos términos, no utilices el servicio."
+      },
+      "service": {
+        "title": "2. Descripción del Servicio",
+        "content": "Project Management es una plataforma de gestión de proyectos diseñada para pequeños equipos. Ofrecemos funciones para crear y organizar workspaces, proyectos e issues de forma colaborativa."
+      },
+      "account": {
+        "title": "3. Cuenta de Usuario",
+        "content": "Eres responsable de mantener la confidencialidad de tus credenciales de acceso y de todas las actividades realizadas en tu cuenta. Notifícanos de inmediato en caso de uso no autorizado."
+      },
+      "use": {
+        "title": "4. Uso Aceptable",
+        "content": "Aceptas utilizar el servicio solo para fines lícitos. Está prohibido usar la plataforma para actividades ilegales, spam, violación de derechos de terceros o cualquier actividad que perjudique a otros usuarios."
+      },
+      "ip": {
+        "title": "5. Propiedad Intelectual",
+        "content": "La plataforma y sus componentes son propiedad de Project Management. El contenido que creas permanece como tuyo. Al utilizar el servicio, nos otorgas una licencia limitada para alojar y mostrar tu contenido."
+      },
+      "termination": {
+        "title": "6. Cancelación",
+        "content": "Nos reservamos el derecho de suspender o cancelar tu cuenta en caso de violación de estos términos. Puedes cerrar tu cuenta en cualquier momento desde la configuración de la plataforma."
+      },
+      "liability": {
+        "title": "7. Limitación de Responsabilidad",
+        "content": "El servicio se proporciona sin garantías de ningún tipo. No somos responsables de pérdida de datos, interrupciones del servicio o daños indirectos derivados del uso de la plataforma."
+      },
+      "changes": {
+        "title": "8. Cambios en los Términos",
+        "content": "Podemos actualizar estos términos periódicamente. Los cambios significativos serán comunicados a los usuarios. El uso continuado de la plataforma tras los cambios constituye la aceptación de los nuevos términos."
+      }
+    },
+    "privacy": {
+      "title": "Política de Privacidad",
+      "collection": {
+        "title": "1. Información que Recopilamos",
+        "content": "Recopilamos la información que nos proporcionas al crear una cuenta (nombre y correo electrónico), datos de uso de la plataforma (workspaces, proyectos e issues creados) e información técnica básica necesaria para el funcionamiento del servicio."
+      },
+      "use": {
+        "title": "2. Cómo Usamos tu Información",
+        "content": "Usamos tu información para proporcionar y mejorar el servicio, autenticar tu acceso, guardar tus preferencias (como el idioma de la interfaz) y garantizar la seguridad de la plataforma."
+      },
+      "storage": {
+        "title": "3. Almacenamiento y Seguridad",
+        "content": "Tus datos se almacenan en servidores seguros. Adoptamos medidas técnicas y organizativas para proteger tu información contra el acceso no autorizado, alteración o destrucción."
+      },
+      "sharing": {
+        "title": "4. Compartir Información",
+        "content": "No vendemos, alquilamos ni compartimos tus datos personales con terceros con fines comerciales. Podemos compartir información cuando lo exija la ley o para proteger nuestros derechos legales."
+      },
+      "rights": {
+        "title": "5. Tus Derechos",
+        "content": "Tienes derecho a acceder, corregir o eliminar tus datos personales en cualquier momento. Para ejercer estos derechos o si tienes preguntas, contáctanos utilizando la información que figura a continuación."
+      },
+      "cookies": {
+        "title": "6. Cookies",
+        "content": "Utilizamos cookies esenciales para la autenticación (token de sesión) y para almacenar tus preferencias de idioma (NEXT_LOCALE). No utilizamos cookies de seguimiento ni publicidad."
+      },
+      "changes": {
+        "title": "7. Cambios en la Política",
+        "content": "Esta política puede actualizarse periódicamente. Te notificaremos sobre cambios relevantes. Recomendamos revisar esta página regularmente para estar al tanto de cualquier modificación."
+      },
+      "contact": {
+        "title": "8. Contacto",
+        "content": "Si tienes preguntas sobre esta Política de Privacidad o sobre cómo tratamos tus datos, contáctanos. Responderemos tu solicitud en un plazo de 30 días hábiles."
+      }
+    }
+  },
+  "landing": {
+    "nav": {
+      "signIn": "Iniciar sesión",
+      "signUp": "Crear cuenta",
+      "openMenu": "Abrir menú",
+      "closeMenu": "Cerrar menú",
+      "terms": "Términos"
+    },
+    "hero": {
+      "badge": "MVP para pequeños equipos",
+      "heading": "Gestiona proyectos con",
+      "headingHighlight": "claridad y enfoque",
+      "subheading": "Organiza workspaces, sigue proyectos y gestiona issues — todo en un solo lugar para que tu equipo trabaje mejor.",
+      "cta": "Empezar ahora",
+      "ctaSecondary": "Ya tengo una cuenta",
+      "disclaimer": "Gratis para empezar · Sin tarjeta de crédito"
+    },
+    "features": {
+      "label": "Funcionalidades",
+      "heading": "Todo lo que tu equipo necesita",
+      "workspace": {
+        "title": "Workspaces",
+        "description": "Crea entornos separados para cada equipo o cliente. Organiza todo en un solo lugar."
+      },
+      "projects": {
+        "title": "Proyectos",
+        "description": "Crea proyectos dentro de cada workspace, sigue el estado y mantén el progreso visible."
+      },
+      "issues": {
+        "title": "Issues",
+        "description": "Divide el trabajo en issues rastreables. Del backlog a completado, nada se pierde."
+      }
+    },
+    "howItWorks": {
+      "label": "Cómo funciona",
+      "heading": "Simple para empezar",
+      "step1": {
+        "title": "Crea tu cuenta",
+        "description": "Regístrate gratis en segundos. No se requiere tarjeta de crédito."
+      },
+      "step2": {
+        "title": "Configura tu workspace",
+        "description": "Crea un workspace para tu equipo y agrega los primeros proyectos."
+      },
+      "step3": {
+        "title": "Sigue el progreso",
+        "description": "Crea issues, actualiza estados y mantén a tu equipo alineado."
+      }
+    },
+    "finalCta": {
+      "heading": "¿Listo para organizar tus proyectos?",
+      "subheading": "Crea tu cuenta ahora y empieza a gestionar tu equipo en minutos.",
+      "cta": "Crear cuenta gratis",
+      "ctaSecondary": "Ya tengo una cuenta"
+    }
+  },
   "project": {
     "backToProjects": "Volver a proyectos",
     "createdAt": "Creado el",

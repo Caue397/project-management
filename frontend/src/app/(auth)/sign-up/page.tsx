@@ -7,10 +7,15 @@ import { network } from '@/network/network';
 import { SignUpForm, signUpSchema } from '@/schemas/auth-schema';
 import { zodResolver } from '@hookform/resolvers/zod';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { LuMail, LuLock, LuUser } from 'react-icons/lu';
+import { useTranslations } from 'next-intl';
 
 export default function SignUpPage() {
+  const router = useRouter();
+  const tTerms = useTranslations('terms');
+
   const {
     register,
     handleSubmit,
@@ -23,6 +28,7 @@ export default function SignUpPage() {
   const { loading, exec } = usePromiseStatus(
     async (data: Omit<SignUpForm, 'confirmPassword'>) => {
       await network.post('/auth/sign-up', data);
+      router.push('/sign-in?registered=true');
     }
   );
 
@@ -98,15 +104,9 @@ export default function SignUpPage() {
           </Link>
         </p>
 
-        <div className="mt-8 pt-6 border-t border-foreground/10 flex items-center justify-center gap-4 text-xs text-foreground/40">
-          <Link href="#" className="hover:text-foreground/60">
-            Ajuda
-          </Link>
-          <Link href="#" className="hover:text-foreground/60">
-            Privacidade
-          </Link>
-          <Link href="#" className="hover:text-foreground/60">
-            Termos
+        <div className="mt-8 pt-6 border-t border-foreground/10 flex items-center justify-center text-xs text-foreground/40">
+          <Link href="/terms" className="hover:text-foreground/60">
+            {tTerms('title')}
           </Link>
         </div>
       </div>

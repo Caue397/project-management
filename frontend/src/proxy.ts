@@ -2,13 +2,13 @@ import { NextRequest, NextResponse } from "next/server";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
 
-const publicRoutes = ["/", "/sign-in", "/sign-up"];
+const publicRoutes = ["/", "/sign-in", "/sign-up", "/terms"];
 
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   const isPublicRoute = publicRoutes.some(
-    (route) => pathname === route || pathname.startsWith(`${route}/`),
+    (route) => pathname === route || pathname.startsWith(`${route}/`)
   );
 
   if (isPublicRoute) return NextResponse.next();
