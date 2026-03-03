@@ -15,7 +15,7 @@ public class CookieUtil {
     @Value("${jwt.cookie.expiration}")
     private int expiration;
 
-    @Value("${cookie.secure:false}")
+    @Value("${jwt.cookie.secure}")
     private boolean cookieSecure;
 
     public String extractToken(HttpServletRequest request) {
