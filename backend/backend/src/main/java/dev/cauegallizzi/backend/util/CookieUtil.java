@@ -51,7 +51,6 @@ public class CookieUtil {
                 .maxAge(0)
                 .sameSite(cookieSecure ? "None" : "Lax")
                 .build();
-        System.out.println("[CookieUtil] deleteAuthCookie -> name=" + cookieName + " secure=" + cookieSecure + " header=" + cookie.toString());
         response.addHeader("Set-Cookie", cookie.toString());
     }
 }
